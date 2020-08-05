@@ -1,0 +1,47 @@
+<div class="modal fade" id="edit-site-modal" tabindex="-1" role="dialog" aria-labelledby="editSiteModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Edit Site</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <form>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit-site-url">URL:</label>
+                    <input class="form-control" id="edit-site-url" spellcheck="false">
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">Job Type:</label>
+                    <select class="form-control" id="edit-site-job-type">
+                        <option>Daily</option>
+                        <option>Interval</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col">
+                            <label for="edit-site-hours">Hours:</label>
+                            <input class="form-control" id="edit-site-hours" spellcheck="false">
+                        </div>
+                        <div class="col">
+                            <label for="edit-site-minutes">Minutes:</label>
+                            <input class="form-control" id="edit-site-minutes" spellcheck="false">
+                        </div>
+                        <div class="col">
+                            <label for="edit-site-seconds">Seconds:</label>
+                            <input class="form-control" id="edit-site-seconds" spellcheck="false">              
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
+                <button type="button" class="btn btn-success">Save</button>
+            </div>
+        </form>
+      </div>
+    </div>
+</div>

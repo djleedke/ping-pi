@@ -1,5 +1,5 @@
   
-from project import app
+from application import app
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, use_reloader=False)
