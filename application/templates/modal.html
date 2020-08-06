@@ -1,0 +1,48 @@
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="editSiteModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Edit Website</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <form>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modal-url">URL:</label>
+                    <input class="form-control" id="modal-url" spellcheck="false" required>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">Job Type:</label>
+                    <select class="form-control" id="modal-job-type">
+                        <option>Daily</option>
+                        <option>Interval</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col">
+                            <label for="modal-hours">Hours:</label>
+                            <input class="form-control" id="modal-hours" spellcheck="false" required>
+                        </div>
+                        <div class="col">
+                            <label for="modal-minutes">Minutes:</label>
+                            <input class="form-control" id="modal-minutes" spellcheck="false" required>
+                        </div>
+                        <div class="col">
+                            <label for="modal-seconds">Seconds:</label>
+                            <input class="form-control" id="modal-seconds" spellcheck="false" required>              
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" id="modal-delete-button" class="btn btn-danger" data-dismiss="modal">Delete</button>
+                <button type="submit" id="modal-save-button" class="btn btn-success">Save</button>
+                <button type="submit" id="modal-add-button" class="btn btn-success">Add</button>
+            </div>
+        </form>
+      </div>
+    </div>
+</div>

@@ -25,10 +25,14 @@
                 {% for site in data.sites %}
                 <tr>
                     <td><a href="{{ site.url }}" target="_blank">{{ site.url }}</a></td>
-                    <td>{{ site.job_type }}</td>
-                    <td>10/0/0</td>
+                    {% if site.job_type == 'cron' %}
+                    <td>Daily</td>
+                    {% elif site.job_type == 'interval' %}
+                    <td>Interval</td>
+                    {% endif %}
+                    <td>{{ site.hours }}/{{ site.minutes }}/{{ site.seconds }}</td>
                     <td>8/4/2020 1:00am</td>
-                    <td><button type="button" class="site-button btn btn-success" data-site-id="{{ site.id }}" data-toggle="modal" data-target="#edit-site-modal">Edit</button></td>
+                    <td><button type="button" class="edit-button btn btn-success" data-site-id="{{ site.id }}" data-toggle="modal" data-target="#modal">Edit</button></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -36,9 +40,8 @@
     </div>
     {% endif %}
     <div class="text-center mt-4">
-        <button type="button" class="btn btn-success mx-auto" data-toggle="modal" data-target="#add-site-modal">Add a site!</button>
+        <button type="button" class="add-button btn btn-success mx-auto" data-toggle="modal" data-target="#modal">Add a URL!</button>
     </div>
-    {% include 'modals/add_site_modal.html' %}
-    {% include 'modals/edit_site_modal.html' %}
+    {% include 'modal.html' %}
 </div>
 {% endblock %}

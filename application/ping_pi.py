@@ -37,18 +37,20 @@ class PingPi:
             print('PingPi: Request failed.')
 
     #Add a website to database  
-    def add_website(self, url, job_type):
+    def add_website(self, data):
 
-        query = self.db.session.query(Website).filter_by(url=url)
+        query = self.db.session.query(Website).filter_by(url=data['url'])
 
         #Url doesn't already exist
         if(not query.count()):
-            new_website = Website(url=url, job_type=job_type)
+            new_website = Website(url=data['url'], job_type=data['job_type'], hours=data['hours'], minutes=data['minutes'], seconds=data['seconds'])
             self.db.session.add(new_website)
             self.db.session.commit()
-            print(f'PingPi: { url } added!')
+            print(f'PingPi: { data["url"] } added!')
+            return 'Success'
         else:
             print('PingPi: Website already exists!')
+            return 'Failed'
 
         return
 
@@ -75,6 +77,9 @@ class PingPi:
             data['id'] = query.id
             data['url'] = query.url
             data['job_type'] = query.job_type
+            data['hours'] = query.hours
+            data['minutes'] = query.minutes
+            data['seconds'] = query.seconds
 
         return data
 
