@@ -2,6 +2,7 @@
 
 /*---------- On Click ----------*/
 
+//Opens modal to edit website
 $('.edit-button').on('click', function(){
 
     //Modal setup
@@ -12,10 +13,11 @@ $('.edit-button').on('click', function(){
     clearModal();
     
     //Fill w/ data
-    getWebsiteData($(this));
+    getWebsite($(this));
 
 });
 
+//Opens modal to add website
 $('.add-button').on('click', function(){
 
     //Modal setup
@@ -27,19 +29,29 @@ $('.add-button').on('click', function(){
 
 });
 
+//Adds a website to database
 $('#modal-add-button').on('click', function(){
     
-    addWebsiteData();
+    if(isModalFormComplete()){
+        addWebsite();
+    }
 
 }); 
 
+$('#modal-delete-button').on('click', function(){
+
+    deleteWebsite();
+
+})
+
 /*---------- AJAX ---------*/
 
-function getWebsiteData(ele){
+//Gets website data from database
+function getWebsite(ele){
 
     $.ajax({
         type : 'POST',
-        url : '/get-website-data',
+        url : '/get-website',
         data : JSON.stringify(ele.data('siteId')),
         contentType: 'application/json; charset=utf-8',
         success: function(result){
@@ -51,7 +63,8 @@ function getWebsiteData(ele){
             } else if (result.job_type === 'cron'){
                 $('#modal-job-type').val("Daily")
             }
-
+            console.log(result.id);
+            $("#modal").attr('data-site-id', result.id);
             $('#modal-hours').val(result.hours);
             $('#modal-minutes').val(result.minutes);
             $('#modal-seconds').val(result.seconds);
@@ -60,7 +73,8 @@ function getWebsiteData(ele){
     });
 }
 
-function addWebsiteData(){
+//Adds website to database
+function addWebsite(){
 
     if($('#modal-job-type').val() === 'Interval'){
         job_type = 'interval'
@@ -78,20 +92,50 @@ function addWebsiteData(){
 
     $.ajax({
         type : 'POST',
-        url : '/add-website-data',
+        url : '/add-website',
         data : JSON.stringify(modal_data),
         contentType: 'application/json; charset=utf-8',
         success: function(result){
-            console.log(result);
+            location.reload();
         }
     });
 }
 
+function deleteWebsite(){
+
+    $.ajax({
+        type : 'POST',
+        url : '/delete-website',
+        data : $('#modal').attr('data-site-id'),
+        contentType: 'application/json; charset=utf-8',
+        success: function(result){
+            location.reload();
+        }
+    });
+
+}
+
 /*---------- Miscellaneous ----------*/
 
+//Clears the modal input values
 function clearModal(){
     $('#modal-url').val('');
     $('#modal-hours').val('');
     $('#modal-minutes').val('');
     $('#modal-seconds').val('');
+    $("#modal").attr('data-site-id', '');
+}
+
+//Returns true if modal form fields are all filled out
+function isModalFormComplete(){
+
+    if($('#modal-url').val() !== '' &&
+        $('#modal-hours').val() !== '' &&
+        $('#modal-minutes').val() !== '' &&
+        $('#modal-seconds').val() !== ''){
+        return true
+    } else {
+        return false
+    }
+
 }

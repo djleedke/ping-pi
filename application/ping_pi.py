@@ -55,17 +55,19 @@ class PingPi:
         return
 
     #Remove a website from database
-    def remove_website(self, url):
+    def delete_website(self, id):
         
-        query = self.db.session.query(Website).filter_by(url=url)
+        query = self.db.session.query(Website).filter_by(id=id)
 
-        if(query.count()):
+        if(query):
+            print(f'PingPi: { query.first().url } was removed.')
             query.delete()
             self.db.session.commit()
-            print(f'PingPi: { url } was removed.')
+            return 'Success'
+        else:
+            return 'Failed'
 
-        return
-
+ 
     #Returns a of data for a single website
     def get_website_data(self, id):
         
