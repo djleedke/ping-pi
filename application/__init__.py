@@ -15,6 +15,6 @@ db = SQLAlchemy(app)
 
 from application.ping_pi import PingPi
 ping_pi = PingPi(db)
-#ping_pi.start_pinging()
+ping_pi.start_pinging()
 
 from application import routes

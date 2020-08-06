@@ -2,6 +2,7 @@ from application.models import Website
 from apscheduler.schedulers.background import BackgroundScheduler
 from tzlocal import get_localzone
 import urllib
+import pdb
 
 class PingPi:
 
@@ -19,12 +20,8 @@ class PingPi:
 
         for site in websites:
 
-            if site.job_type == 'interval':
-                self.scheduler.add_job(self.ping_url,'interval', [site.url], minutes=1, seconds=20, id=str(site.id))
-            
-            if site.job_type == 'cron':
-                self.scheduler.add_job(self.ping_url,'cron', [site.url], hour=15, minute=40, id=str(site.id))
-        
+            self.add_site_to_scheduler(site)
+
         return
 
     #Sends a request to the specified url
@@ -46,6 +43,12 @@ class PingPi:
             new_website = Website(url=data['url'], job_type=data['job_type'], hours=data['hours'], minutes=data['minutes'], seconds=data['seconds'])
             self.db.session.add(new_website)
             self.db.session.commit()
+
+            try:
+                self.add_site_to_scheduler(new_website)
+            except:
+                print('PingPi: Error, could not add job.')
+
             print(f'PingPi: { data["url"] } added!')
             return 'Success'
         else:
@@ -60,13 +63,42 @@ class PingPi:
         query = self.db.session.query(Website).filter_by(id=id)
 
         if(query):
+            
+            self.scheduler.remove_job(str(id))
+
             print(f'PingPi: { query.first().url } was removed.')
             query.delete()
             self.db.session.commit()
+
             return 'Success'
         else:
             return 'Failed'
 
+    #Add a website to database  
+    def edit_website(self, data):
+        query = self.db.session.query(Website).filter_by(id=data['id']).first()
+
+        #Url doesn't already exist
+        if(query):
+
+            query.url = data['url']
+            query.job_type = data['job_type']
+            query.hours = data['hours']
+            query.minutes = data['minutes']
+            query.seconds = data['seconds']
+            self.db.session.commit()
+
+            try:
+                self.scheduler.remove_job(data['id'])
+                self.add_site_to_scheduler(query)
+            except:
+                print('PingPi: Error, could not edit job.')
+
+            print('PingPi: Changes saved!')
+            return 'Success'
+        else:
+            print('PingPi: Website already exists!')
+            return 'Failed'
  
     #Returns a of data for a single website
     def get_website_data(self, id):
@@ -89,3 +121,14 @@ class PingPi:
     def get_all_websites(self):
         query = self.db.session.query(Website).all()
         return query
+
+    def add_site_to_scheduler(self, site):
+
+        if site.job_type == 'interval':
+            self.scheduler.add_job(self.ping_url,'interval', [site.url], hours=site.hours, minutes=site.minutes, seconds=site.seconds, id=str(site.id))
+            
+        if site.job_type == 'cron':
+            self.scheduler.add_job(self.ping_url,'cron', [site.url], hour=site.hours, minute=site.minutes, second=site.seconds, id=str(site.id))
+
+        return
+        

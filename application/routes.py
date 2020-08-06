@@ -33,3 +33,10 @@ def delete_website():
         return ping_pi.delete_website(request.get_json())
     else:
         return 'Failed'
+
+@app.route('/edit-website', methods=['GET', 'POST'])
+def edit_website():
+    if request.method == 'POST':
+        return ping_pi.edit_website(request.get_json())
+    else:
+        return 'Failed'

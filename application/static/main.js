@@ -30,19 +30,22 @@ $('.add-button').on('click', function(){
 });
 
 //Adds a website to database
-$('#modal-add-button').on('click', function(){
-    
+$('#modal-add-button').on('click', function(e){
+    e.preventDefault();
     if(isModalFormComplete()){
         addWebsite();
     }
-
 }); 
 
-$('#modal-delete-button').on('click', function(){
-
+$('#modal-delete-button').on('click', function(e){
+    e.preventDefault();
     deleteWebsite();
+});
 
-})
+$('#modal-save-button').on('click', function(e){
+    e.preventDefault();
+    editWebsite();
+});
 
 /*---------- AJAX ---------*/
 
@@ -76,19 +79,7 @@ function getWebsite(ele){
 //Adds website to database
 function addWebsite(){
 
-    if($('#modal-job-type').val() === 'Interval'){
-        job_type = 'interval'
-    } else if ($('#modal-job-type').val() === 'Daily'){
-        job_type = 'cron'
-    }
-
-    modal_data = {
-        url : $('#modal-url').val(),
-        job_type : job_type,
-        hours : $('#modal-hours').val(),
-        minutes : $('#modal-minutes').val(),
-        seconds : $('#modal-seconds').val()
-    }
+    modal_data = createModalDataObject();
 
     $.ajax({
         type : 'POST',
@@ -115,14 +106,30 @@ function deleteWebsite(){
 
 }
 
+function editWebsite(){
+
+    modal_data = createModalDataObject();
+
+    console.log('asd');
+    $.ajax({
+        type : 'POST',
+        url : '/edit-website',
+        data : JSON.stringify(modal_data),
+        contentType: 'application/json; charset=utf-8',
+        success: function(result){
+            location.reload();
+        }
+    });
+}
+
 /*---------- Miscellaneous ----------*/
 
 //Clears the modal input values
 function clearModal(){
     $('#modal-url').val('');
-    $('#modal-hours').val('');
-    $('#modal-minutes').val('');
-    $('#modal-seconds').val('');
+    $('#modal-hours').val(0);
+    $('#modal-minutes').val(0);
+    $('#modal-seconds').val(0);
     $("#modal").attr('data-site-id', '');
 }
 
@@ -137,5 +144,23 @@ function isModalFormComplete(){
     } else {
         return false
     }
+}
 
+function createModalDataObject(){
+
+    if($('#modal-job-type').val() === 'Interval'){
+        job_type = 'interval'
+    } else if ($('#modal-job-type').val() === 'Daily'){
+        job_type = 'cron'
+    }
+
+    var modal_data = {
+        id : $('#modal').attr('data-site-id'),
+        url : $('#modal-url').val(),
+        job_type : job_type,
+        hours : $('#modal-hours').val(),
+        minutes : $('#modal-minutes').val(),
+        seconds : $('#modal-seconds').val()
+    }
+    return modal_data;
 }
