@@ -19,7 +19,6 @@ class PingPi:
         websites = self.get_all_websites()
 
         for site in websites:
-
             self.add_site_to_scheduler(site)
 
         return
@@ -31,7 +30,7 @@ class PingPi:
             print(f'PingPi: { url }: Response Code: { request.getcode() }')
             request.close()
         except:
-            print('PingPi: Request failed.')
+            print(f'PingPi: { url }: Request failed.')
 
     #Add a website to database  
     def add_website(self, data):

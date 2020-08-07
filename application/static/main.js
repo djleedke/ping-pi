@@ -47,6 +47,64 @@ $('#modal-save-button').on('click', function(e){
     editWebsite();
 });
 
+/*---------- Keypress ----------*/
+
+$('.time-input').on('keypress', function(e){
+    
+    //Preventing e, ., -, +
+    if(e.keyCode === 101 || e.keyCode === 46 || e.keyCode === 45 || e.keyCode === 43){
+        e.preventDefault();
+    }
+
+});
+
+/*---------- Validation ----------*/
+
+$('#modal-hours').on('input', function(e){
+
+    if($('#modal-job-type').val() === 'Daily'){
+        if($(this).val() > 23){
+            $(this).val(23);
+        }
+    } else {
+        if($(this).val() > 168){
+            $(this).val(168); //Capped at 1 week intervals
+        }
+    }
+
+    //Prevent blank
+    if($(this).val() === ''){
+        $(this).val(0);
+    }
+
+});
+
+$('#modal-minutes').on('input', function(e){
+
+    if($(this).val() > 59){
+        $(this).val(59);
+    }
+
+    //Prevent blank
+    if($(this).val() === ''){
+        $(this).val(0);
+    }
+
+});
+
+$('#modal-seconds').on('input', function(e){
+
+    if($(this).val() > 59){
+        $(this).val(59);
+    }
+
+    //Prevent blank
+    if($(this).val() === ''){
+        $(this).val(0);
+    }
+
+});
+
 /*---------- AJAX ---------*/
 
 //Gets website data from database

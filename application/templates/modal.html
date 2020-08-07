@@ -11,7 +11,7 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label for="modal-url">URL:</label>
-                    <input class="form-control" id="modal-url" spellcheck="false" required>
+                    <input class="form-control" id="modal-url" spellcheck="false" autocomplete="off" required>
                 </div>
                 <div class="form-group">
                     <label for="exampleFormControlSelect1">Job Type:</label>
@@ -24,15 +24,15 @@
                     <div class="row">
                         <div class="col">
                             <label for="modal-hours">Hours:</label>
-                            <input class="form-control" id="modal-hours" spellcheck="false" required>
+                            <input class="time-input form-control" type="number" min="0" max="24" step="1" id="modal-hours" spellcheck="false" autocomplete="off" required>
                         </div>
                         <div class="col">
                             <label for="modal-minutes">Minutes:</label>
-                            <input class="form-control" id="modal-minutes" spellcheck="false" required>
+                            <input class="time-input form-control" type="number" min="0" max="59" step="1" id="modal-minutes" spellcheck="false" autocomplete="off" required>
                         </div>
                         <div class="col">
                             <label for="modal-seconds">Seconds:</label>
-                            <input class="form-control" id="modal-seconds" spellcheck="false" required>              
+                            <input class="time-input form-control" type="number" min="0" max="59" step="1" id="modal-seconds" spellcheck="false" autocomplete="off" required>              
                         </div>
                     </div>
                 </div>
