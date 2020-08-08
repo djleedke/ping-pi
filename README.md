@@ -8,16 +8,17 @@ Prior to this I was utilizing [Kaffeine](https://kaffeine.herokuapp.com/) which 
 
 The Pi in PingPi is because the app is intended to be run on a Raspberry Pi, though you could definitely run it on other systems if you wish.  I use my Raspberry Pi to run the site over my local network, and then can access it via other computers on the network.  This way I don't need my main desktop to be on 24/7 to keep the pings going.
 
+## Contents
+
+- [Features](#features)
+- [Setup](#setup)
+- [Built With](#built-with)
+- [Acknowledgements](#acknowledgements)
+
 ## Features
 
 - Flask web interface to schedule website pings at certain intervals or at a certain time each day
 - Countdown timer so you can see when the next ping will take place
-
-## Contents
-
-- [Setup](#setup)
-- [Built With](#built-with)
-- [Acknowledgements](#acknowledgements)
 
 ## Setup
 
