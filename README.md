@@ -84,11 +84,11 @@ $ hostname -I
 ```
 This will give a nice long string really all we care about is the beginning which should look something like this: ```10.0.0.123```.  This is the IP we will be hosting from locally.  To start the Flask server using this enter the following command with your own IP address:
 ```
-$ python -m flask run -h 10.0.0.123 -p 8000
+$ python -m flask run -h 10.0.0.123 -p 8001
 ```
-*Note: I've chosen port 8000 here but you can host on any port you want as long as it isn't already in use.*
+*Note: I've chosen port 8001 here but you can host on any port you want as long as it isn't already in use.*
 
-And voila!  You should now be hosting over your local network.  To test try going to ```10.0.0.123:8000``` from another computer's browser and you should see the page load up.  Ping away!
+And voila!  You should now be hosting over your local network.  To test try going to ```10.0.0.123:8001``` from another computer's browser and you should see the page load up.  Ping away!
 
 ## Built With
 
