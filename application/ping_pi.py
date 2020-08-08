@@ -6,7 +6,7 @@ import urllib, pdb, datetime
 class PingPi:
 
     def __init__(self, db):
-
+        db.create_all()
         self.db = db
         self.scheduler = BackgroundScheduler(timezone=get_localzone())
 

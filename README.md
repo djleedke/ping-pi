@@ -15,14 +15,80 @@ The Pi in PingPi is because the app is intended to be run on a Raspberry Pi, tho
 
 ## Features
 
-- Ability to schedule website pings at certain intervals or at a certain time each day
+- Flask web interface to schedule website pings at certain intervals or at a certain time each day
 - Countdown timer so you can see when the next ping will take place
 
 ## Setup
 
 These are instuctions to get the application up and running on a Raspberry Pi which uses a Linux operating system.  You could absolutely run it on other operating systems but a few of the commands could vary slightly.
 
+To get started open a terminal from a new folder somewhere on your Pi, once that's done initialize git:
+```
+$ git init
+```
 
+Now we will pull the repository into the folder:
+```
+$ git pull https://github.com/djleedke/ping-pi-app.git
+```
+
+Next we will create the virtual environment:
+```
+$ python -m virtualenv venv
+```
+
+And activate it:
+```
+$ source venv/bin/activate
+```
+
+Before we start the app we need to install our requirements:
+```
+$ python -m pip install -r requirements.txt
+```
+
+You will also need to create a secret key, the app will try to find this in file called ```local_settings.py``` which you can create and place at ```/application/local_settings.py```.
+
+To create a secret key open a terminal window and enter the python shell:
+```
+$ python
+```
+In the shell enter the following:
+```
+>>> import uuid
+>>> uuid.uuid4().hex
+`dd18e3b4ee4743c4850b1bf51153cbb1` #This will be different for you
+```
+Place this key into the ```local_settings.py``` file you just created.
+
+```
+import os
+
+os.environ['SECRET_KEY'] = 'dd18e3b4ee4743c4850b1bf51153cbb1'
+```
+At this point we should be able to run the app, first set up your environment variable and set our environment to production:
+
+```
+$ export FLASK_APP=run.py
+
+$ export FLASK_ENV=production
+```
+
+Run Flask:
+```
+$ python -m flask run
+```
+You should now be able to access the app from typing in the local host address ```127.0.0.1:5000``` into a browser's address bar.  What if we want to host it on our local network? First let's get the local IP address of the Pi by typing the following in a terminal window:
+```
+$ hostname -I
+```
+This will give a nice long string really all we care about is the beginning which should look something like this: ```10.0.0.123```.  This is the IP we will be hosting from locally.  To start the Flask server using this enter the following command with your own IP address:
+```
+$ python -m flask run -h 10.0.0.123 -p 8000
+```
+*Note: I've chosen port 8000 here but you can host on any port you want as long as it isn't already in use.*
+
+And voila!  You should now be hosting over your local network.  To test try going to ```10.0.0.123:8000``` from another computer's browser and you should see the page load up.  Ping away!
 
 ## Built With
 

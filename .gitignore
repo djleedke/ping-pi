@@ -4,6 +4,7 @@
 local_settings.py
 sandbox.py
 init.bat
+site.db
 
 #My folders
 media/
