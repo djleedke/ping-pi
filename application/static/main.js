@@ -11,7 +11,7 @@ $('.edit-button').on('click', function(){
     $('#modal-add-button').css('display', 'none');
     clearModal();
     
-    //Fill w/ data
+    //Fill modal with w/ data
     getWebsiteForModal($(this));
 
 });
@@ -28,7 +28,7 @@ $('.add-button').on('click', function(){
 
 });
 
-//Adds a website to database
+//Add website button on modal
 $('#modal-add-button').on('click', function(e){
     e.preventDefault();
     if(isModalFormComplete()){
@@ -36,11 +36,13 @@ $('#modal-add-button').on('click', function(e){
     }
 }); 
 
+//Delete website button on modal
 $('#modal-delete-button').on('click', function(e){
     e.preventDefault();
     deleteWebsite();
 });
 
+//Save changes button on modal
 $('#modal-save-button').on('click', function(e){
     e.preventDefault();
     editWebsite();
@@ -61,14 +63,9 @@ $('.time-input').on('keypress', function(e){
 
 $('#modal-hours').on('input', function(e){
 
-    if($('#modal-job-type').val() === 'Daily'){
-        if($(this).val() > 23){
-            $(this).val(23);
-        }
-    } else {
-        if($(this).val() > 168){
-            $(this).val(168); //Capped at 1 week intervals
-        }
+    //Limiting to 24 hours (23:59:59)
+    if($(this).val() > 23){
+        $(this).val(23);
     }
 
     //Prevent blank
@@ -80,6 +77,7 @@ $('#modal-hours').on('input', function(e){
 
 $('#modal-minutes').on('input', function(e){
 
+    //Limiting to 59 minutes max (23:59:59)
     if($(this).val() > 59){
         $(this).val(59);
     }
@@ -93,6 +91,7 @@ $('#modal-minutes').on('input', function(e){
 
 $('#modal-seconds').on('input', function(e){
 
+    //Limiting to 59 seconds max (23:59:59)
     if($(this).val() > 59){
         $(this).val(59);
     }
@@ -106,25 +105,25 @@ $('#modal-seconds').on('input', function(e){
 
 /*---------- Countdown Timers ----------*/
 
-var next_timer= false;
 var restart_timers = [];
 
+//When the document is loaded we start up the timers
 $(document).ready(function(){
 
+    //Passing in the td elements to start the countdown in
     $('.ping-countdown').each(function(){
         startCountdownTimer($(this));
     });
 
-
-
 });
 
+//This interval checks periodically to see if any timers need to be restarted
 setInterval(function(){
 
+    //If we have a restart queued
     if(restart_timers.length > 0){
 
         for(i = 0; i < restart_timers.length; i++){
-            console.log(restart_timers[i]);
             startCountdownTimer(restart_timers[i]);
             restart_timers.shift();
         }
@@ -132,6 +131,7 @@ setInterval(function(){
 
 }, 5000);
 
+//Starts a countdown timer for the specified td element
 function startCountdownTimer(ele){
 
     var timer = new Timer();
@@ -139,7 +139,7 @@ function startCountdownTimer(ele){
 
     $.ajax({
         type : 'POST',
-        url : '/get-time-til-ping',
+        url : '/get-seconds-til-ping',
         data : JSON.stringify(data['siteId']),
         contentType: 'application/json; charset=utf-8',
         success: function(result){
@@ -152,20 +152,17 @@ function startCountdownTimer(ele){
         }
     });
 
-    //Every second we tick
+    //Every second the countdown updates
     timer.addEventListener('secondsUpdated', function (e) {
         ele.html(timer.getTimeValues().toString());
     });
 
-    //Timer completed
+    //Timer completed we add the element to an array of timer elements that need to be restarted
     timer.addEventListener('targetAchieved', function (e){
         ele.html('Ping!');
         restart_timers.push(ele);
     });
 }
-
-
-
 
 /*---------- AJAX ---------*/
 
@@ -186,7 +183,7 @@ function getWebsiteForModal(ele){
             } else if (result.job_type === 'cron'){
                 $('#modal-job-type').val("Daily")
             }
-            console.log(result.hours);
+
             $("#modal").attr('data-site-id', result.id);
             $('#modal-hours').val(result.hours);
             $('#modal-minutes').val(result.minutes);
@@ -212,6 +209,7 @@ function addWebsite(){
     });
 }
 
+//Delete website from database
 function deleteWebsite(){
 
     $.ajax({
@@ -226,11 +224,11 @@ function deleteWebsite(){
 
 }
 
+//Updates website in the database
 function editWebsite(){
 
     modal_data = createModalDataObject();
 
-    console.log('asd');
     $.ajax({
         type : 'POST',
         url : '/edit-website',
@@ -266,6 +264,7 @@ function isModalFormComplete(){
     }
 }
 
+//Pulls all of the info off of the modal and formats it to send to the server
 function createModalDataObject(){
 
     if($('#modal-job-type').val() === 'Interval'){
@@ -283,10 +282,4 @@ function createModalDataObject(){
         seconds : $('#modal-seconds').val()
     }
     return modal_data;
-}
-
-function leadingZeroes(num, size){
-    var s = num + "";
-    while(s.length < size) s = "0" + s;
-    return s;
 }

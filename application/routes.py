@@ -41,9 +41,9 @@ def edit_website():
     else:
         return 'Failed'
 
-@app.route('/get-time-til-ping', methods=['GET', 'POST'])
-def get_time_til_ping():
+@app.route('/get-seconds-til-ping', methods=['GET', 'POST'])
+def get_seconds_til_ping():
     if request.method == 'POST':
-        return jsonify(ping_pi.get_time_til_next_ping(request.get_json()))
+        return jsonify(ping_pi.get_seconds_til_ping(request.get_json()))
     else:
         return 'Failed'

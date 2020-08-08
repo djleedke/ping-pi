@@ -30,7 +30,7 @@
                     {% elif site.job_type == 'interval' %}
                     <td>Interval</td>
                     {% endif %}
-                    <td>{{ site.hours }}/{{ site.minutes }}/{{ site.seconds }}</td>
+                    <td>{{ '%02d' % (site.hours) }}:{{ '%02d' % (site.minutes) }}:{{ '%02d' % (site.seconds) }}</td>
                     <td class="ping-countdown" data-site-id="{{ site.id }}" data-job-type="{{ site.job_type }}"></td>
                     <td><button type="button" class="edit-button btn btn-success" data-site-id="{{ site.id }}" data-toggle="modal" data-target="#modal">Edit</button></td>
                 </tr>

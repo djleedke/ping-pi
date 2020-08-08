@@ -7,9 +7,6 @@ class PingPi:
 
     def __init__(self, db):
 
-        #db.drop_all()
-        #db.create_all()
-
         self.db = db
         self.scheduler = BackgroundScheduler(timezone=get_localzone())
 
@@ -26,80 +23,76 @@ class PingPi:
 
         return
 
-    #Sends a request to the specified url
+    #Sends a request to the specified url, this is the "ping"
     def ping_site(self, site_id):
 
-        query = self.db.session.query(Website).filter_by(id=site_id).first()
+        site = self.db.session.query(Website).filter_by(id=site_id).first()
 
         try:
-            request = urllib.request.urlopen(query.url)
-            print(f'PingPi: { query.url }: Response Code: { request.getcode() }')
+            request = urllib.request.urlopen(site.url)
+            print(f'PingPi: { site.url }: Response Code: { request.getcode() }')
 
-            query.last_ping = datetime.datetime.now()
+            site.last_ping = datetime.datetime.now()
 
             self.db.session.commit()
             request.close()
         except:
-            print(f'PingPi: { query.url }: Request failed.')
+            print(f'PingPi: { site.url }: Request failed.')
 
     #Add a website to database  
     def add_website(self, data):
 
-        query = self.db.session.query(Website).filter_by(url=data['url'])
+        new_website = Website(url=data['url'], job_type=data['job_type'], hours=data['hours'], minutes=data['minutes'], seconds=data['seconds'])
+        
+        self.db.session.add(new_website)
+        self.db.session.commit()
 
-        #Url doesn't already exist
-        if(not query.count()):
-            new_website = Website(url=data['url'], job_type=data['job_type'], hours=data['hours'], minutes=data['minutes'], seconds=data['seconds'])
-            self.db.session.add(new_website)
-            self.db.session.commit()
-
-            try:
-                self.add_site_to_scheduler(new_website)
-            except:
-                print('PingPi: Error, could not add job.')
-
-            print(f'PingPi: { data["url"] } added!')
-            return 'Success'
-        else:
-            print('PingPi: Website already exists!')
+        try:
+            self.add_site_to_scheduler(new_website)
+        except:
+            print('PingPi: Error, could not add job.')
             return 'Failed'
+
+        print(f'PingPi: { data["url"] } added!')
+        return 'Success'
 
         return
 
     #Remove a website from database
     def delete_website(self, id):
         
-        query = self.db.session.query(Website).filter_by(id=id)
+        site = self.db.session.query(Website).filter_by(id=id)
 
-        if(query):
+        if(site):
             
             self.scheduler.remove_job(str(id))
 
-            print(f'PingPi: { query.first().url } was removed.')
-            query.delete()
+            print(f'PingPi: { site.first().url } was removed.')
+            site.delete()
             self.db.session.commit()
 
             return 'Success'
         else:
             return 'Failed'
 
-    #Add a website to database  
+    #Edit a website in the database  
     def edit_website(self, data):
-        query = self.db.session.query(Website).filter_by(id=data['id']).first()
+
+        site = self.db.session.query(Website).filter_by(id=data['id']).first()
 
         #Url doesn't already exist
-        if(query):
+        if(site):
 
-            query.url = data['url']
-            query.job_type = data['job_type']
-            query.hours = data['hours']
-            query.minutes = data['minutes']
-            query.seconds = data['seconds']
+            site.url = data['url']
+            site.job_type = data['job_type']
+            site.hours = data['hours']
+            site.minutes = data['minutes']
+            site.seconds = data['seconds']
             self.db.session.commit()
 
             try:
                 self.scheduler.remove_job(data['id'])
-                self.add_site_to_scheduler(query)
+                self.add_site_to_scheduler(site)
             except:
                 print('PingPi: Error, could not edit job.')
 
@@ -109,47 +102,46 @@ class PingPi:
             print('PingPi: Website already exists!')
             return 'Failed'
  
-    #Returns a of data for a single website
+    #Returns a dictionary of data for a single website
     def get_website_data(self, site_id):
         
         data = {}
         
-        query = self.db.session.query(Website).get(site_id)
+        site = self.db.session.query(Website).get(site_id)
 
-        if query:
-            data['id'] = query.id
-            data['url'] = query.url
-            data['job_type'] = query.job_type
-            data['hours'] = query.hours
-            data['minutes'] = query.minutes
-            data['seconds'] = query.seconds
+        if site:
+            data['id'] = site.id
+            data['url'] = site.url
+            data['job_type'] = site.job_type
+            data['hours'] = site.hours
+            data['minutes'] = site.minutes
+            data['seconds'] = site.seconds
   
         return data
 
     #Returns a list of all websites in database
     def get_all_websites(self):
-        query = self.db.session.query(Website).all()
-        return query
+        site = self.db.session.query(Website).all()
+        return site
 
     #Gets the amount of time remaining before the next ping
-    def get_time_til_next_ping(self, site_id):
+    def get_seconds_til_ping(self, site_id):
 
-        query = self.db.session.query(Website).get(site_id)
-
+        site = self.db.session.query(Website).get(site_id)
 
         #If it's an interval we get the next ping by adding the interval to our last ping
-        if(query.job_type == 'interval'):
-            last_ping = query.last_ping
-            delta = datetime.timedelta(hours=query.hours, minutes=query.minutes, seconds=query.seconds)
+        if(site.job_type == 'interval'):
+            last_ping = site.last_ping
+            delta = datetime.timedelta(hours=site.hours, minutes=site.minutes, seconds=site.seconds)
             next_ping = last_ping + delta
             seconds_til_ping = (next_ping - datetime.datetime.now()).seconds
 
         #If its a daily job we use todays date and the specified hours, minutes, and seconds to calculate last ping
-        elif(query.job_type == 'cron'):
+        elif(site.job_type == 'cron'):
 
             today = datetime.datetime.today()
 
-            last_ping = datetime.datetime(today.year, today.month, today.day, query.hours, query.minutes, query.seconds)
+            last_ping = datetime.datetime(today.year, today.month, today.day, site.hours, site.minutes, site.seconds)
             delta = datetime.timedelta(days=1)
 
             next_ping = last_ping + delta
@@ -158,7 +150,7 @@ class PingPi:
 
         return seconds_til_ping
 
-    #Adds the website to our scheduler, handled definitely depending on whether or not cron or interval
+    #Adds the website to our scheduler, handled differently depending on whether or not cron or interval
     def add_site_to_scheduler(self, site):
 
         if site.job_type == 'interval':
