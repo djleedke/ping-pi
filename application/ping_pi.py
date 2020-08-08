@@ -1,12 +1,15 @@
 from application.models import Website
 from apscheduler.schedulers.background import BackgroundScheduler
 from tzlocal import get_localzone
-import urllib
-import pdb
+import urllib, pdb, datetime
 
 class PingPi:
 
     def __init__(self, db):
+
+        #db.drop_all()
+        #db.create_all()
+
         self.db = db
         self.scheduler = BackgroundScheduler(timezone=get_localzone())
 
@@ -24,13 +27,20 @@ class PingPi:
         return
 
     #Sends a request to the specified url
-    def ping_url(self, url):
+    def ping_site(self, site_id):
+
+        query = self.db.session.query(Website).filter_by(id=site_id).first()
+
         try:
-            request = urllib.request.urlopen(url)
-            print(f'PingPi: { url }: Response Code: { request.getcode() }')
+            request = urllib.request.urlopen(query.url)
+            print(f'PingPi: { query.url }: Response Code: { request.getcode() }')
+
+            query.last_ping = datetime.datetime.now()
+
+            self.db.session.commit()
             request.close()
         except:
-            print(f'PingPi: { url }: Request failed.')
+            print(f'PingPi: { query.url }: Request failed.')
 
     #Add a website to database  
     def add_website(self, data):
@@ -100,11 +110,11 @@ class PingPi:
             return 'Failed'
  
     #Returns a of data for a single website
-    def get_website_data(self, id):
+    def get_website_data(self, site_id):
         
         data = {}
         
-        query = self.db.session.query(Website).get(id)
+        query = self.db.session.query(Website).get(site_id)
 
         if query:
             data['id'] = query.id
@@ -113,7 +123,7 @@ class PingPi:
             data['hours'] = query.hours
             data['minutes'] = query.minutes
             data['seconds'] = query.seconds
-
+  
         return data
 
     #Returns a list of all websites in database
@@ -121,13 +131,43 @@ class PingPi:
         query = self.db.session.query(Website).all()
         return query
 
+    #Gets the amount of time remaining before the next ping
+    def get_time_til_next_ping(self, site_id):
+
+        query = self.db.session.query(Website).get(site_id)
+
+
+        #If it's an interval we get the next ping by adding the interval to our last ping
+        if(query.job_type == 'interval'):
+            last_ping = query.last_ping
+            delta = datetime.timedelta(hours=query.hours, minutes=query.minutes, seconds=query.seconds)
+            next_ping = last_ping + delta
+            seconds_til_ping = (next_ping - datetime.datetime.now()).seconds
+
+        #If its a daily job we use todays date and the specified hours, minutes, and seconds to calculate last ping
+        elif(query.job_type == 'cron'):
+
+            today = datetime.datetime.today()
+
+            last_ping = datetime.datetime(today.year, today.month, today.day, query.hours, query.minutes, query.seconds)
+            delta = datetime.timedelta(days=1)
+
+            next_ping = last_ping + delta
+
+            seconds_til_ping = (next_ping - datetime.datetime.now()).seconds
+
+        return seconds_til_ping
+
+    #Adds the website to our scheduler, handled definitely depending on whether or not cron or interval
     def add_site_to_scheduler(self, site):
 
         if site.job_type == 'interval':
-            self.scheduler.add_job(self.ping_url,'interval', [site.url], hours=site.hours, minutes=site.minutes, seconds=site.seconds, id=str(site.id))
+            site.last_ping = datetime.datetime.now()
+            self.db.session.commit()
+            self.scheduler.add_job(self.ping_site,'interval', [site.id], hours=site.hours, minutes=site.minutes, seconds=site.seconds, id=str(site.id))
             
         if site.job_type == 'cron':
-            self.scheduler.add_job(self.ping_url,'cron', [site.url], hour=site.hours, minute=site.minutes, second=site.seconds, id=str(site.id))
+            self.scheduler.add_job(self.ping_site,'cron', [site.id], hour=site.hours, minute=site.minutes, second=site.seconds, id=str(site.id))
 
         return
         

@@ -13,8 +13,8 @@ def index():
 
 #---------- AJAX ---------
 
-@app.route('/get-website', methods=['GET', 'POST'])
-def get_website():
+@app.route('/get-website-data', methods=['GET', 'POST'])
+def get_website_data():
     if request.method == 'POST':
         return jsonify(ping_pi.get_website_data(request.get_json()))
     else:
@@ -38,5 +38,12 @@ def delete_website():
 def edit_website():
     if request.method == 'POST':
         return ping_pi.edit_website(request.get_json())
+    else:
+        return 'Failed'
+
+@app.route('/get-time-til-ping', methods=['GET', 'POST'])
+def get_time_til_ping():
+    if request.method == 'POST':
+        return jsonify(ping_pi.get_time_til_next_ping(request.get_json()))
     else:
         return 'Failed'

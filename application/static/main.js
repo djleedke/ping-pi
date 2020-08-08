@@ -1,5 +1,4 @@
 
-
 /*---------- On Click ----------*/
 
 //Opens modal to edit website
@@ -13,7 +12,7 @@ $('.edit-button').on('click', function(){
     clearModal();
     
     //Fill w/ data
-    getWebsite($(this));
+    getWebsiteForModal($(this));
 
 });
 
@@ -105,14 +104,77 @@ $('#modal-seconds').on('input', function(e){
 
 });
 
-/*---------- AJAX ---------*/
+/*---------- Countdown Timers ----------*/
 
-//Gets website data from database
-function getWebsite(ele){
+var next_timer= false;
+var restart_timers = [];
+
+$(document).ready(function(){
+
+    $('.ping-countdown').each(function(){
+        startCountdownTimer($(this));
+    });
+
+
+
+});
+
+setInterval(function(){
+
+    if(restart_timers.length > 0){
+
+        for(i = 0; i < restart_timers.length; i++){
+            console.log(restart_timers[i]);
+            startCountdownTimer(restart_timers[i]);
+            restart_timers.shift();
+        }
+    }
+
+}, 5000);
+
+function startCountdownTimer(ele){
+
+    var timer = new Timer();
+    var data = ele.data();
 
     $.ajax({
         type : 'POST',
-        url : '/get-website',
+        url : '/get-time-til-ping',
+        data : JSON.stringify(data['siteId']),
+        contentType: 'application/json; charset=utf-8',
+        success: function(result){
+
+            //Initalize timer
+            timer.start({
+                countdown: true,
+                startValues: {seconds:result}
+            });
+        }
+    });
+
+    //Every second we tick
+    timer.addEventListener('secondsUpdated', function (e) {
+        ele.html(timer.getTimeValues().toString());
+    });
+
+    //Timer completed
+    timer.addEventListener('targetAchieved', function (e){
+        ele.html('Ping!');
+        restart_timers.push(ele);
+    });
+}
+
+
+
+
+/*---------- AJAX ---------*/
+
+//Gets website data from database
+function getWebsiteForModal(ele){
+
+    $.ajax({
+        type : 'POST',
+        url : '/get-website-data',
         data : JSON.stringify(ele.data('siteId')),
         contentType: 'application/json; charset=utf-8',
         success: function(result){
@@ -124,7 +186,7 @@ function getWebsite(ele){
             } else if (result.job_type === 'cron'){
                 $('#modal-job-type').val("Daily")
             }
-            console.log(result.id);
+            console.log(result.hours);
             $("#modal").attr('data-site-id', result.id);
             $('#modal-hours').val(result.hours);
             $('#modal-minutes').val(result.minutes);
@@ -221,4 +283,10 @@ function createModalDataObject(){
         seconds : $('#modal-seconds').val()
     }
     return modal_data;
+}
+
+function leadingZeroes(num, size){
+    var s = num + "";
+    while(s.length < size) s = "0" + s;
+    return s;
 }
