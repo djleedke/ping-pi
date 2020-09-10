@@ -90,7 +90,9 @@ $ python -m flask run -h 10.0.0.123 -p 8001
 ```
 *Note: I've chosen port 8001 here but you can host on any port you want as long as it isn't already in use.*
 
-And voila!  You should now be hosting over your local network.  To test try going to ```10.0.0.123:8001``` from another computer's browser and you should see the page load up.  Ping away!
+And voila!  You should now be hosting over your local network.  To test try going to (insert whatever your IP address was here) ```10.0.0.123:8001``` from another computer's browser and you should see the page load up.  If for whatever reason this doesn't work for you, it's possible you may need to tweak a few settings in your router.
+
+Enjoy!
 
 ## Built With
 
