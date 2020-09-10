@@ -105,4 +105,4 @@ Enjoy!
 
 ## Acknowledgements
 
-The idea for this app was inspired by [Kaffeine](https://kaffeine.herokuapp.com/) which also lets you schedule website pings.
+The idea for this app was inspired by [Kaffeine](https://kaffeine.herokuapp.com/) which also lets you schedule website pings (but only every 30 minutes!).
