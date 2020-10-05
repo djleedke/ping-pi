@@ -1,12 +1,12 @@
 # Ping Pi
 
-## Overview
-
 PingPi is a small application that allows you to schedule pings to websites of your choosing via a web interface.  It was created as a work around to Heroku's sleeping dynos.  Since the websites go to sleep after a half hour of non-use I needed a way to wake my sites at certain times, or to keep it up if I wanted it to be up all the time.  
 
 Prior to this I was utilizing [Kaffeine](https://kaffeine.herokuapp.com/) which was great but only allows you to ping the a site every 30 minutes.  This wastes dyno hours as the site is up the majority of the day.  In my case I only needed my site, [TweetryDish](http://tweetry-dish-app.herokuapp.com/), to be awake at 7pm each day to fire off a scheduled tweet and that was it.  This app allows me to do that.
 
 The Pi in PingPi is because the app is intended to be run on a Raspberry Pi, though you could definitely run it on other systems if you wish.  I use my Raspberry Pi to run the site over my local network, and then can access it via other computers on the network.  This way I don't need my main desktop to be on 24/7 to keep the pings going.
+
+![ping-pi](https://user-images.githubusercontent.com/33850990/95130173-caa41c00-0721-11eb-832d-cab79e4f5128.gif)
 
 ## Contents
 
